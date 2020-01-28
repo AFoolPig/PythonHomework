@@ -1,0 +1,110 @@
+作业四：Tornado HTTP 通信框架使用
+
+系统要求：
+Ubuntu 16.04/18.04
+Python 3.5以上版本
+
+准备工作：
+使用 pip 安装 tornado==5.1.1 依赖库
+
+任务1  tornado 实现 HTTP 同步服务器
+任务详细描述：
+1. 实现 HTTP Rest 风格接口
+url:
+	/interface-rest-1
+请求方法:
+	get
+请求参数:
+	val1 字符串类型
+	Val2 字符串类型
+响应数据:
+	返回包含请求参数的json格式数据
+
+2. 实现 HTTP Rest 风格接口
+url:
+	/interface-rest-2
+请求方法:
+	post
+请求参数:
+	val1 字符串类型
+	Val2 字符串类型
+响应数据:
+	返回包含请求参数的json格式数据
+
+3. 实现 HTTP Rest 风格接口用于接收上传文件
+url:
+	/interface-rest-uploadfile
+请求参数:
+	file 文件类型数据
+响应数据:
+	返回json格式数据，要求响应数据可以体现文件上传成功或失败
+额外操作:
+	将接收到的文件保存到本地，文件名与原来保持一致，所有上传的文件，保存在同一目录下
+
+4. 实现 HTTP接口用于文件下载
+url:
+	/interface-rest-downloadfile
+请求参数:
+	Filename 字符串类型
+响应数据:
+	返回文件名为filename 的文件,即让浏览器显示下载返回的文件
+额外操作:
+	filename的搜索范围是第三步保存上传文件的路径。
+如果找不到，响应http 404状态以及适当的描述性数据
+
+任务 1 额外要求
+	1. 根据实际的返回内容，添加适合的响应头参数 Content-Type
+	2. 添加适当的文件上传和下载的请求类型
+	3. 异常处理：
+		比如 文件重复上传等
+		遇到异常情况，则响应 http 404 状态并添加适当的描述性内容
+----------------------------------------------------------
+任务2 tornado 实现 Websocket 服务器
+额外工具 - websocket测试工具: http://www.websocket-test.com/
+任务详细描述:
+1. 使用WebsocketHandler 实现 websocket 服务端
+url:
+	/interface-websocket1
+实现功能: Echo
+	在 websocket 测试工具(  websocket客户端 )中，发送消息
+	服务端接收消息后，在控制台打印消息并将相同的消息返回给客户端
+
+2. 实现 websocket 周期性消息
+url:
+	/interface-websocket2
+实现功能:每5秒发送一条消息
+	使用tornado中的类，实现该周期性任务
+	每隔5秒向客户端发送一条消息，格式为:
+		Period Message: <序号> <时间>
+	其中：
+		序号: 从1开始，每发送一条数据序号加1
+		时间: 消息产生的时间 格式: HH:MM:SS
+消息示例：
+	Period Message: 1 10:10:10
+	Period Message: 2 10:10:15
+	Period Message: 3 10:10:20
+	...
+
+3. 在 Websocket 服务端实现稍复杂的处理
+url:
+	/interface-websocket3
+实现功能: 对客户端的不同输入执行不同的返回结果
+	客户端输入 start：
+		立即返回消息：Period Message Started!
+		同时按照步骤2中描述的方式周期性发送消息
+		序号从1开始
+	输入 stop：
+		立即返回消息：Period Message Stopped!
+		同时停止周期性消息发送
+	输入 continue
+		立即返回消息：Period Message Started!
+		同时按照步骤2中描述的方式周期性发送消息
+		序号从之前停止的序号继续
+	输入其他消息
+		立即返回消息：Error Message： 客户端输入
+
+任务3要考虑 start stop continue是否发送错误
+	比如：如果任务没有停止过不能执行continue
+	当遇到用户错误操作时，返回消息：
+	Error Message： 客户端输入 - 错误原因
+
